@@ -15,11 +15,7 @@ dotenv.config({ path: path.join(path.resolve(), '/.env') });
 
 app.use(express.json());
 app.use(urlencoded({ extended: false }));
-app.use(
-  cors({
-    origin: 'https://verdant-custard-20044e.netlify.app',
-  })
-);
+app.use(cors());
 app.use(morgan('dev'));
 
 app.use('/api/v1/users', userRoute);
