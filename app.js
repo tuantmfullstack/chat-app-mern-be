@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: 'https://statuesque-truffle-30853b.netlify.app/',
+    origin: 'https://statuesque-truffle-30853b.netlify.app/*',
   })
 );
 app.use(morgan('dev'));
