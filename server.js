@@ -14,7 +14,7 @@ mongoose.connect(process.env.DB_URL.replace('<password>', process.env.DB_PW), {
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: 'http://localhost:5173',
+  cors: 'https://statuesque-truffle-30853b.netlify.app',
 });
 
 const users = new Map();
