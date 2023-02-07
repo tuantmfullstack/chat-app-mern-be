@@ -18,9 +18,17 @@ const messageSchema = new mongoose.Schema(
       type: String,
       default: 'text',
       enum: {
-        values: ['text', 'img', 'url', 'video'],
+        values: ['text', 'img', 'video'],
         message: '{VALUE} is not supported',
       },
+    },
+    forwardMessage: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Message',
+    },
+    personEmotion: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
     },
     fileName: String,
     fileUrl: String,
