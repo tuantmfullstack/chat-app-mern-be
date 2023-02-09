@@ -3,6 +3,7 @@ import { protect } from '../controllers/authController.js';
 import {
   createMessage,
   deleteMessages,
+  emotionMessage,
   getMessagesByConversation,
 } from '../controllers/messageController.js';
 
@@ -12,6 +13,6 @@ router.use(protect);
 
 router.post('', createMessage);
 router.get('/:conversationId', getMessagesByConversation);
-router.delete('/:id', deleteMessages);
+router.route('/:id').post(emotionMessage).delete(deleteMessages);
 
 export default router;

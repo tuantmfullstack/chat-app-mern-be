@@ -10,15 +10,12 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    text: {
-      type: String,
-      required: true,
-    },
+    text: String,
     type: {
       type: String,
-      default: 'text',
+      required: true,
       enum: {
-        values: ['text', 'img', 'video'],
+        values: ['text', 'img', 'file'],
         message: '{VALUE} is not supported',
       },
     },
@@ -26,9 +23,10 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'Message',
     },
-    personEmotion: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
+    emotions: {
+      type: [String],
+      enum: ['LOVE', 'SMILE', 'WOW', 'SAD', 'ANGRY', 'LIKE', 'DISLIKE'],
+      default: [],
     },
     fileName: String,
     fileUrl: String,

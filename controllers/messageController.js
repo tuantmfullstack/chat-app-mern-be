@@ -24,13 +24,9 @@ export const getMessagesByConversation = catchAsync(async (req, res) => {
 export const createMessage = catchAsync(async (req, res) => {
   const user = req.user;
 
-  const { conversationId, text } = req.body;
+  const msg = { ...req.body, senderId: user._id };
 
-  const message = await Message.create({
-    conversationId,
-    senderId: user._id,
-    text,
-  });
+  const message = await Message.create(msg);
 
   res.status(200).json({
     status: 'success',
@@ -38,5 +34,25 @@ export const createMessage = catchAsync(async (req, res) => {
   });
 });
 
-// Update in the future
-export const deleteMessages = catchAsync(async (req, res) => {});
+export const deleteMessages = catchAsync(async (req, res) => {
+  await Message.findByIdAndDelete(req.params.id);
+
+  res.status(200).json({
+    status: 'success',
+    _id: req.params.id,
+  });
+});
+
+export const emotionMessage = catchAsync(async (req, res) => {
+  const message = await Message.findById(req.params.id);
+
+  if (!message.emotions.includes(req.body.type))
+    message.emotions.push(req.body.type);
+  console.log(message.emotions);
+  await message.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    status: 'success',
+    type: req.body.type,
+  });
+});
