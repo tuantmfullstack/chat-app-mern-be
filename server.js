@@ -24,11 +24,19 @@ io.on('connection', (socket) => {
   socket.on('sendUser', (userId) => {
     users.set(userId, socket.id);
     io.emit('getUsers', [...users.keys()]);
+    console.log({ id: socket.id, users });
   });
 
   socket.on('sendMessage', (message) => {
-    // console.log({ message });
     io.to(users.get(message.receiverId)).emit('getMessage', message);
+  });
+
+  socket.on('disconnect', () => {
+    const disconnectUser = [...users.keys()].find(
+      (id) => users.get(id) === socket.id
+    );
+    users.delete(disconnectUser);
+    io.emit('getUsers', [...users.keys()]);
   });
 });
 
