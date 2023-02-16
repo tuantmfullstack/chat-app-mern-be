@@ -10,12 +10,12 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 const app = express();
+app.use(cors());
 
 dotenv.config({ path: path.join(path.resolve(), '/.env') });
 
 app.use(express.json());
 app.use(urlencoded({ extended: false }));
-app.use(cors());
 app.use(morgan('dev'));
 
 app.use('/api/v1/users', userRoute);
