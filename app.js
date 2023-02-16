@@ -12,7 +12,8 @@ import morgan from 'morgan';
 const app = express();
 app.use(
   cors({
-    origin: 'https://statuesque-truffle-30853b.netlify.app',
+    origin: 'https://statuesque-truffle-30853b.netlify.app/*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   })
 );
 
