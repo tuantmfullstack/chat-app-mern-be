@@ -10,12 +10,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 const app = express();
-app.use(
-  cors({
-    origin: 'https://statuesque-truffle-30853b.netlify.app/*',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  })
-);
+app.use(cors());
 
 dotenv.config({ path: path.join(path.resolve(), '/.env') });
 
