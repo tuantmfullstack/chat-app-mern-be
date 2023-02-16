@@ -24,11 +24,14 @@ io.on('connection', (socket) => {
   socket.on('sendUser', (userId) => {
     users.set(userId, socket.id);
     io.emit('getUsers', [...users.keys()]);
-    console.log({ id: socket.id, users });
   });
 
   socket.on('sendMessage', (message) => {
     io.to(users.get(message.receiverId)).emit('getMessage', message);
+  });
+
+  socket.on('sendKeyUp', (userId) => {
+    io.to(users.get(userId)).emit('getKeyUp', 123);
   });
 
   socket.on('disconnect', () => {
