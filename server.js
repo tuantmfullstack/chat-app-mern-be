@@ -16,7 +16,6 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: 'https://statuesque-truffle-30853b.netlify.app',
   methods: ['GET', 'POST'],
-  credentials: true,
 });
 
 const users = new Map();
