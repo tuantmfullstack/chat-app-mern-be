@@ -11,6 +11,7 @@ import morgan from 'morgan';
 
 const app = express();
 app.use(cors());
+app.options('*', cors());
 
 dotenv.config({ path: path.join(path.resolve(), '/.env') });
 
