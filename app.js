@@ -10,8 +10,25 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 const app = express();
-app.use(cors());
-app.options('*', cors());
+// app.use(cors());
+app.use(function (req, res, next) {
+  // res.header("Access-Control-Allow-Origin", "*");
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'https://statuesque-truffle-30853b.netlify.app/',
+  ];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  res.header('Access-Control-Allow-credentials', true);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, UPDATE');
+  next();
+});
 
 dotenv.config({ path: path.join(path.resolve(), '/.env') });
 
