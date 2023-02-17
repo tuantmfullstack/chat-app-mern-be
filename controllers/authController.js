@@ -26,6 +26,7 @@ const sendToClient = (user, res, statusCode, message) => {
 
 export const protect = catchAsync(async (req, res, next) => {
   const tokenHeader = req.headers.authorization;
+  // console.log(req.headers);
   let token;
 
   if (tokenHeader && tokenHeader.startsWith('Bearer')) {
@@ -34,6 +35,7 @@ export const protect = catchAsync(async (req, res, next) => {
 
   if (!token) next(new AppError('You have to login before accessing it.'));
 
+  console.log(token);
   const { id } = jwt.verify(token, process.env.JWT_SECRET);
 
   const user = await User.findById(id).select('+password');

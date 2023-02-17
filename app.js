@@ -10,34 +10,58 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 const app = express();
-// app.use(cors());
-app.use(function (req, res, next) {
-  // res.header("Access-Control-Allow-Origin", "*");
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'https://statuesque-truffle-30853b.netlify.app/',
-  ];
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-  );
-  res.setHeader('Access-Control-Allow-credentials', true);
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'GET, POST, PUT, DELETE, UPDATE'
-  );
+// app.use(function (req, res, next) {
+//   const allowedOrigins = [
+//     'http://localhost:5173',
+//     'http://127.0.0.1:5173',
+//     'https://statuesque-truffle-30853b.netlify.app/',
+//   ];
+//   const origin = req.headers.origin;
+//   console.log({ headers: req.headers });
+//   if (allowedOrigins.includes(origin)) {
+//     res.setHeader('Access-Control-Allow-Origin', origin);
+//   }
+//   res.setHeader(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+//   );
+//   // res.setHeader('Access-Control-Allow-Headers', '*');
+//   res.setHeader('Access-Control-Allow-credentials', true);
+//   res.setHeader(
+//     'Access-Control-Allow-Methods',
+//     'GET, POST, PUT, DELETE, UPDATE'
+//   );
+//   res.setHeader('')
+//   next();
+// });
+
+app.use((req, res, next) => {
+  console.log(req);
   next();
 });
 
+const corOptions = {
+  // origin: [
+  //   'http://localhost:5173/*',
+  //   'http://127.0.0.1:5173/*',
+  //   'https://statuesque-truffle-30853b.netlify.app/*',
+  // ],
+  origin: '*',
+  methods: 'GET, POST, PUT, DELETE, UPDATE',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  // credentials: true,
+  preflightContinue: false,
+};
+
+app.use(cors(corOptions));
+
 dotenv.config({ path: path.join(path.resolve(), '/.env') });
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 app.use(express.json());
 app.use(urlencoded({ extended: false }));
-app.use(morgan('dev'));
 
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/auth', authRoute);
