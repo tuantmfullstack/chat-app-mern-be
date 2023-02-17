@@ -47,10 +47,10 @@ const corOptions = {
   //   'https://statuesque-truffle-30853b.netlify.app/*',
   // ],
   origin: '*',
-  methods: 'GET, POST, PUT, DELETE, UPDATE',
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  // methods: 'GET, POST, PUT, DELETE, UPDATE',
+  // allowedHeaders: ['Content-Type', 'Authorization'],
   // credentials: true,
-  preflightContinue: false,
+  // preflightContinue: false,
 };
 
 app.use(cors(corOptions));
