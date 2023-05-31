@@ -23,8 +23,6 @@ export const getUser = catchAsync(async (req, res) => {
 });
 
 export const updateUser = catchAsync(async (req, res) => {
-  console.log(req.body);
-
   const user = await User.findByIdAndUpdate(req.user.id, req.body, {
     new: true,
   });

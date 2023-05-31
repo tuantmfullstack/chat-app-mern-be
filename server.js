@@ -14,8 +14,8 @@ mongoose.connect(process.env.DB_URL.replace('<password>', process.env.DB_PW), {
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: 'https://statuesque-truffle-30853b.netlify.app',
-  // cors: 'http://localhost:5173',
+  // cors: 'https://statuesque-truffle-30853b.netlify.app',
+  cors: 'http://localhost:5173',
   methods: ['GET', 'POST'],
 });
 
@@ -23,6 +23,7 @@ const users = new Map();
 
 io.on('connection', (socket) => {
   socket.on('sendUser', (userId) => {
+    console.log({ userId, id: socket.id });
     users.set(userId, socket.id);
     io.emit('getUsers', [...users.keys()]);
   });

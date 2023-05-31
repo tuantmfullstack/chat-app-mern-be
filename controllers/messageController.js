@@ -48,7 +48,6 @@ export const emotionMessage = catchAsync(async (req, res) => {
 
   if (!message.emotions.includes(req.body.type))
     message.emotions.push(req.body.type);
-  console.log(message.emotions);
   await message.save({ validateBeforeSave: false });
 
   res.status(200).json({

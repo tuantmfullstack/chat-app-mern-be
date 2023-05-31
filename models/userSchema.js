@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema(
     },
     passwordResetToken: String,
     passwordResetExpired: Date,
+    isGoogleAccount: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -73,8 +77,6 @@ userSchema.methods.createPasswordResetToken = function () {
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-
-  // console.log({ resetToken }, this.passwordResetToken);
 
   this.passwordResetExpired = Date.now() + 10 * 60 * 1000;
 

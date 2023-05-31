@@ -3,6 +3,8 @@ import User from '../models/userSchema.js';
 import jwt from 'jsonwebtoken';
 import AppError from '../utils/appError.js';
 import crypto from 'crypto';
+import email from '../utils/email.js';
+import { log } from 'console';
 
 const signToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -26,7 +28,6 @@ const sendToClient = (user, res, statusCode, message) => {
 
 export const protect = catchAsync(async (req, res, next) => {
   const tokenHeader = req.headers.authorization;
-  // console.log(req.headers);
   let token;
 
   if (tokenHeader && tokenHeader.startsWith('Bearer')) {
@@ -35,7 +36,6 @@ export const protect = catchAsync(async (req, res, next) => {
 
   if (!token) next(new AppError('You have to login before accessing it.'));
 
-  console.log(token);
   const { id } = jwt.verify(token, process.env.JWT_SECRET);
 
   const user = await User.findById(id).select('+password');
@@ -46,29 +46,51 @@ export const protect = catchAsync(async (req, res, next) => {
 });
 
 export const login = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, isGoogleAccount } = req.body;
 
-  if (!email || !password)
-    throw new AppError('Please provide us email and password', 400);
+  if (!email) throw new AppError('Please provide us email', 400);
 
   const user = await User.findOne({ email }).select('+password');
-  if (!user) throw new AppError('There is no user with this email', 400);
+  if (!user) {
+    if (isGoogleAccount) {
+      return signup(req, res);
+    } else throw new AppError('There is no user with this email', 400);
+  }
 
-  if (!(await user.correctPassword(password, user.password)))
-    throw new AppError('Wrong password', 400);
+  if (!user.isGoogleAccount) {
+    if (!(await user.correctPassword(password, user.password)))
+      throw new AppError('Wrong password', 400);
+  }
   const message = 'Welcome to chat app!';
   sendToClient(user, res, 200, message);
 });
 
 export const signup = catchAsync(async (req, res) => {
-  const { name, email, password, passwordConfirm } = req.body;
-  const user = await User.create({ name, email, password, passwordConfirm });
+  let { name, email, password, passwordConfirm, isGoogleAccount } = req.body;
+
+  if (isGoogleAccount) {
+    password = crypto.randomBytes(12).toString('hex');
+    passwordConfirm = password;
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    passwordConfirm,
+    isGoogleAccount,
+  });
+
   const message = 'Create account successfully!';
   sendToClient(user, res, 201, message);
 });
 
 export const updatePassword = catchAsync(async (req, res) => {
   const user = req.user;
+
+  if (user.isGoogleAccount) {
+    throw new AppError("Google account can't not update password");
+  }
 
   const { currentPassword, password, passwordConfirm } = req.body;
 
@@ -92,22 +114,35 @@ export const updatePassword = catchAsync(async (req, res) => {
 });
 
 export const forgotPassword = catchAsync(async (req, res, next) => {
-  console.log(req.body);
+  if (!req.body.email) {
+    throw new AppError('Please provide us email!');
+  }
+
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return next(new AppError('There is no user with email address.', 404));
+  }
+
+  if (user.isGoogleAccount) {
+    throw new AppError("Google account can't not update password");
   }
 
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
   try {
+    // todo: update path when push to prod
     const resetURL = `http://localhost:5173/resetPassword/${resetToken}`;
-    // await new Email(user, resetURL).sendPasswordReset();
+
+    const message = `Forgot your password? Submit a PATCH request with your new password and password confirm to: ${resetURL}. If you didn't forget your password, please ignore this email.`;
+
+    const subject = 'PASSWORD RESET TOKEN (ONLY VALID ON 10 MINS)';
+
+    email({ to: user.email, subject, message });
 
     res.status(200).json({
       status: 'success',
-      message: `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL} .If you didn't forget your password, please ignore this email!`,
+      message: 'Password reset token has been sent to your email!',
     });
   } catch (err) {
     user.passwordResetToken = undefined;
@@ -134,6 +169,10 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 
   if (!user) {
     return next(new AppError('Token is invalid or has expired', 400));
+  }
+
+  if (user.isGoogleAccount) {
+    throw new AppError("Google account can't not update password");
   }
 
   user.password = req.body.password;
